@@ -18,20 +18,9 @@
 //#define SHOULD_POLL 1
 //#define SHOULD_FLUSH 1
 
-/* Optional per-message delivery callback (triggered by poll() or flush())
- * when a message has been successfully delivered or permanently
- * failed delivery (after retries).
- */
-static void dr_msg_cb(rd_kafka_t *kafka_handle,
-                      const rd_kafka_message_t *rkmessage, void *opaque) {
-  if (rkmessage->err) {
-    g_error("Message delivery failed: %s", rd_kafka_err2str(rkmessage->err));
-  }
-}
-
 g_autoptr(GKeyFile) key_file = NULL;
 
-void *producerThd(void *vargp) {
+void producerThd(void *vargp) {
   char errstr[512];
   const char *topic = "data-plane-perf";
   const char *user_ids[6] = {"eabara",   "jsmith",  "sgarcia",
@@ -97,8 +86,6 @@ void *producerThd(void *vargp) {
 }
 
 int main(int argc, char **argv) {
-  rd_kafka_conf_t *conf;
-  char errstr[512];
 
   // Parse the command line.
   if (argc != 2) {
@@ -124,7 +111,7 @@ int main(int argc, char **argv) {
     pthread_create(&thd[i], NULL, producerThd, NULL);
   }
 
-  for (i = 0; i < THD_SIZE; i++) {
+  for (int i = 0; i < THD_SIZE; i++) {
     pthread_join(thd[i], NULL);
   }
 
