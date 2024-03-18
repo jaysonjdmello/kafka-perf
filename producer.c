@@ -20,7 +20,7 @@
 
 g_autoptr(GKeyFile) key_file = NULL;
 
-void producerThd(void *vargp) {
+void *producerThd(void *vargp) {
   char errstr[512];
   const char *topic = "data-plane-perf";
   const char *user_ids[6] = {"eabara",   "jsmith",  "sgarcia",
@@ -41,7 +41,7 @@ void producerThd(void *vargp) {
         rd_kafka_new(RD_KAFKA_PRODUCER, conf, errstr, sizeof(errstr));
     if (!producer) {
       g_error("Failed to create new producer: %s", errstr);
-      return;
+      return NULL;
     }
 
     // Configuration object is now owned, and freed, by the rd_kafka_t instance.
@@ -69,7 +69,7 @@ void producerThd(void *vargp) {
       if (err) {
         g_error("Failed to produce to topic %s: %s", topic,
                 rd_kafka_err2str(err));
-        return;
+        return NULL;
       }
 
 #ifdef SHOULD_POLL
@@ -83,6 +83,7 @@ void producerThd(void *vargp) {
 #endif
     rd_kafka_destroy(producer);
   }
+  return NULL;
 }
 
 int main(int argc, char **argv) {

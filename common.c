@@ -1,4 +1,6 @@
 #include <glib.h>
+#include <librdkafka/rdkafka.h>
+
 
 static void load_config_group(rd_kafka_conf_t *conf,
                               GKeyFile *key_file,
