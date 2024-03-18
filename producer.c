@@ -6,14 +6,14 @@
 
 #define ARR_SIZE(arr) (sizeof((arr)) / sizeof((arr[0])))
 
-#define THD_SIZE 75
+#define THD_SIZE 2000
 
-#define SEND_MESSAGE 1
-#define MSG_SIZE 1000
+//#define SEND_MESSAGE 1
+#define MSG_SIZE 2
 
 #define CONNECTION_ITERATIONS 100000
 #define MESSAGE_COUNT_PER_ITERATION 100000
-#define KAFKA_PARTITION 7
+#define KAFKA_PARTITION 72
 
 //#define SHOULD_POLL 1
 //#define SHOULD_FLUSH 1
