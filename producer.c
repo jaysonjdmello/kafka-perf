@@ -8,7 +8,8 @@
 
 #define THD_SIZE 2000
 
-//#define SEND_MESSAGE 1
+//Y
+#define SEND_MESSAGE 1
 #define MSG_SIZE 2
 
 #define CONNECTION_ITERATIONS 100000
