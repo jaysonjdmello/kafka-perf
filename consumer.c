@@ -3,11 +3,20 @@
 
 #include "common.c"
 
-void basic_consume_loop(rd_kafka_t *rk,
-                        rd_kafka_topic_partition_list_t *topics) {
+void basic_consume_loop(rd_kafka_t *rk) {
   rd_kafka_resp_err_t err;
 
-  if ((err = rd_kafka_subscribe(rk, topics))) {
+  const char *topic = "data-plane-perf";
+
+  // Create a list of topics to subscribe to
+  rd_kafka_topic_partition_list_t *subscription;
+  subscription = rd_kafka_topic_partition_list_new(
+      1); // Assuming we'll subscribe to one topic for now
+  rd_kafka_topic_partition_list_add(
+      subscription, topic,
+      RD_KAFKA_PARTITION_UA); // UA = Unassigned partition
+
+  if ((err = rd_kafka_subscribe(rk, subscription))) {
     fprintf(stderr, "%% Failed to start consuming topics: %s\n",
             rd_kafka_err2str(err));
     exit(1);
@@ -64,17 +73,7 @@ int main(int argc, char **argv) {
   // Configuration object is now owned, and freed, by the rd_kafka_t instance.
   conf = NULL;
 
-  const char *topic = "data-plane-perf";
-
-  // Create a list of topics to subscribe to
-  rd_kafka_topic_partition_list_t *subscription;
-  subscription = rd_kafka_topic_partition_list_new(
-      1); // Assuming we'll subscribe to one topic for now
-  rd_kafka_topic_partition_list_add(
-      subscription, topic,
-      RD_KAFKA_PARTITION_UA); // UA = Unassigned partition
-
-  basic_consume_loop(consumer, subscription);
+  basic_consume_loop(consumer);
 
   return 0;
 }
