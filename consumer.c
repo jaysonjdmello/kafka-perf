@@ -6,14 +6,14 @@
 void basic_consume_loop(rd_kafka_t *rk) {
   rd_kafka_resp_err_t err;
 
-  const char *topic = "data-plane-perf";
-
   // Create a list of topics to subscribe to
   rd_kafka_topic_partition_list_t *subscription;
-  subscription = rd_kafka_topic_partition_list_new(
-      1); // Assuming we'll subscribe to one topic for now
+
+  subscription = rd_kafka_topic_partition_list_new(1);
+
+  // Assuming we'll subscribe to one topic for now
   rd_kafka_topic_partition_list_add(
-      subscription, topic,
+      subscription, "data-plane-perf",
       RD_KAFKA_PARTITION_UA); // UA = Unassigned partition
 
   if ((err = rd_kafka_subscribe(rk, subscription))) {
