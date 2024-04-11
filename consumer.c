@@ -76,7 +76,7 @@ void *consumerThd(void *vargp) {
       } else {
         g_message("Consumer error: %s",
                   rd_kafka_message_errstr(consumer_message));
-        return 1;
+        return;
       }
     } else {
 #ifdef DEBUG
@@ -100,9 +100,6 @@ void *consumerThd(void *vargp) {
 }
 
 int main(int argc, char **argv) {
-  rd_kafka_resp_err_t err;
-  char errstr[512];
-
   // Parse the command line.
   if (argc != 2) {
     g_error("Usage: %s <config.ini>", argv[0]);
@@ -110,17 +107,16 @@ int main(int argc, char **argv) {
   }
 
   // Parse the configuration.
-  // See https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
+  // // See https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
   const char *config_file = argv[1];
 
   g_autoptr(GError) error = NULL;
-  g_autoptr(GKeyFile) key_file = g_key_file_new();
+  key_file = g_key_file_new();
   if (!g_key_file_load_from_file(key_file, config_file, G_KEY_FILE_NONE,
                                  &error)) {
     g_error("Error loading config file: %s", error->message);
     return 1;
   }
-
   g_info("Starting %d Kafka Producer Threads", THD_SIZE);
 
   pthread_t thd[THD_SIZE];
