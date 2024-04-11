@@ -3,36 +3,23 @@
 
 #include "common.c"
 
+#define THD_SIZE 64
+
 static volatile sig_atomic_t run = 1;
+
+g_autoptr(GKeyFile) key_file = NULL;
 
 /**
  * @brief Signal termination of program
  */
 static void stop(int sig) { run = 0; }
 
-int main(int argc, char **argv) {
-  rd_kafka_t *consumer;
-  rd_kafka_conf_t *conf;
+void *consumerThd(void *vargp) {
   rd_kafka_resp_err_t err;
   char errstr[512];
 
-  // Parse the command line.
-  if (argc != 2) {
-    g_error("Usage: %s <config.ini>", argv[0]);
-    return 1;
-  }
-
-  // Parse the configuration.
-  // See https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
-  const char *config_file = argv[1];
-
-  g_autoptr(GError) error = NULL;
-  g_autoptr(GKeyFile) key_file = g_key_file_new();
-  if (!g_key_file_load_from_file(key_file, config_file, G_KEY_FILE_NONE,
-                                 &error)) {
-    g_error("Error loading config file: %s", error->message);
-    return 1;
-  }
+  rd_kafka_t *consumer;
+  rd_kafka_conf_t *conf;
 
   // Load the relevant configuration sections.
   conf = rd_kafka_conf_new();
@@ -110,6 +97,40 @@ int main(int argc, char **argv) {
 
   // Destroy the consumer.
   rd_kafka_destroy(consumer);
+}
+
+int main(int argc, char **argv) {
+  rd_kafka_resp_err_t err;
+  char errstr[512];
+
+  // Parse the command line.
+  if (argc != 2) {
+    g_error("Usage: %s <config.ini>", argv[0]);
+    return 1;
+  }
+
+  // Parse the configuration.
+  // See https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
+  const char *config_file = argv[1];
+
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GKeyFile) key_file = g_key_file_new();
+  if (!g_key_file_load_from_file(key_file, config_file, G_KEY_FILE_NONE,
+                                 &error)) {
+    g_error("Error loading config file: %s", error->message);
+    return 1;
+  }
+
+  g_info("Starting %d Kafka Producer Threads", THD_SIZE);
+
+  pthread_t thd[THD_SIZE];
+  for (int i = 0; i < THD_SIZE; i++) {
+    pthread_create(&thd[i], NULL, consumerThd, NULL);
+  }
+
+  for (int i = 0; i < THD_SIZE; i++) {
+    pthread_join(thd[i], NULL);
+  }
 
   return 0;
 }
