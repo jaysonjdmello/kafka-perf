@@ -5,6 +5,9 @@
 
 #define THD_SIZE 64
 
+#define KAFKA_PARTITION 0
+#define TOPIC "wireguard-test-5"
+
 static volatile sig_atomic_t run = 1;
 
 g_autoptr(GKeyFile) key_file = NULL;
@@ -38,10 +41,10 @@ void *consumerThd(void *vargp) {
   conf = NULL;
 
   // Convert the list of topics to a format suitable for librdkafka.
-  const char *topic = "data-plane-perf";
+  const char *topic = TOPIC;
   rd_kafka_topic_partition_list_t *subscription =
       rd_kafka_topic_partition_list_new(1);
-  rd_kafka_topic_partition_list_add(subscription, topic, RD_KAFKA_PARTITION_UA);
+  rd_kafka_topic_partition_list_add(subscription, topic, KAFKA_PARTITION);
 
   // Subscribe to the list of topics.
   err = rd_kafka_subscribe(consumer, subscription);

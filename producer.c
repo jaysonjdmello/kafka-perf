@@ -6,24 +6,23 @@
 
 #define ARR_SIZE(arr) (sizeof((arr)) / sizeof((arr[0])))
 
-#define THD_SIZE 2000
-
-//Y
+#define THD_SIZE 64
 #define SEND_MESSAGE 1
-#define MSG_SIZE 2
+#define MSG_SIZE 2048
 
 #define CONNECTION_ITERATIONS 100000
 #define MESSAGE_COUNT_PER_ITERATION 100000
-#define KAFKA_PARTITION 72
+#define KAFKA_PARTITION 0
+#define TOPIC "wireguard-test-5"
 
-//#define SHOULD_POLL 1
+#define SHOULD_POLL 1
 //#define SHOULD_FLUSH 1
 
 g_autoptr(GKeyFile) key_file = NULL;
 
 void *producerThd(void *vargp) {
   char errstr[512];
-  const char *topic = "data-plane-perf";
+  const char *topic = TOPIC;
   const char *user_ids[6] = {"eabara",   "jsmith",  "sgarcia",
                              "jbernard", "htanaka", "awalther"};
   char product[MSG_SIZE];
